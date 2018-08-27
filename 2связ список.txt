@@ -1,0 +1,215 @@
+#include <iostream>
+using namespace std;
+#define tab "\t"
+
+class Element
+{
+	int Data;
+	Element* pNext;
+	Element* pPrev;
+public:
+	Element(int Data, Element* pNext = nullptr, Element* pPrev = nullptr)
+	{
+		this->Data = Data;
+		this->pNext = pNext;
+		this->pPrev = pPrev;
+		cout << "EConstructor:" << tab << this << endl;
+
+	}
+	~Element()
+	{
+		cout << "EDestructor:" << tab << this << endl;
+		cout << "************************************************" << endl;
+	}
+	friend class List;
+};
+
+class List
+{
+	Element* Head;
+	Element* Tail;
+	int Size;
+public:
+	List()//Создает пустой список
+	{
+		//Когда двухсвяз список пуст его голова и хвост содержат(указывают) на 0
+		Head = Tail = nullptr;
+		Size = 0;
+		cout << "LConstructor:" << tab << this << endl;
+
+	}
+	~List()
+	{
+		cout << "LDestructor:" << tab << this << endl;
+
+	}
+
+	//Adding elements:
+	void push_front(int Data)
+	{
+		// когда в списке появляеться первый елемент он одновременно являеться и головой и хвостом списка
+		Element* New = new Element(Data);
+		if (Head == nullptr && Tail == nullptr)
+		{
+			Head = Tail = New;
+			Size++;
+			return;
+		}
+		New->pNext = Head;
+		Head->pPrev = New;
+		Head = New;
+		Size++;
+		//Head = new Element(Data);
+	}
+	void push_back(int Data)
+	{
+		if (Head == nullptr && Tail == nullptr)
+		{
+			push_front(Data);
+			return;
+		}
+		Element* New = new Element(Data);
+		New->pPrev = Tail;
+		Tail->pNext = New;
+		Tail = New;
+		Size++;
+	}
+
+	void Insert(int Data, int Index)
+	{
+		if (Index > Size)
+		{
+			cout << "=========================" << endl;
+			cout << "Error:!!!!!" << endl;
+			cout << "=========================" << endl;
+			return;
+		}
+		if (Index == 0)
+		{
+			push_front(Data);
+			return;
+
+		}
+		if (Index == Size)
+		{
+			push_back(Data);
+			return;
+		}
+		Element* Temp;
+		if (Index < Size / 2)
+		{
+			Temp = Head;
+			for (int i = 0; i < Index; i++)Temp = Temp->pNext;
+		}
+		else
+		{
+			Temp = Tail;
+			for (int i = 0; i < Size - Index - 1; i++)Temp = Temp->pPrev;
+		}
+		Element* New = new Element(Data);
+		New->pPrev = Temp->pPrev;
+		New->pNext = Temp;
+		Temp->pPrev->pNext = New;
+		Temp->pPrev = New;
+		Size++;
+		/*Temp->pPrev = Temp->pPrev->pNext = new Element(Data, Temp, Temp->pPrev);*/
+	}
+
+	/*void Erase(int Index)
+	{
+		
+		Element*Temp;
+		for (int i = 0; i < Index - 1; i++)Temp = Temp->pPrev;
+		Element*Buffer = Head;
+		Temp = Temp->pNext->pPrev;
+		Temp = Temp->pPrev->pNext;
+		delete Buffer;
+		Size--;
+	}*/
+	
+
+
+	// Deleting elements
+	void pop_front()
+	{
+		Head = Head->pNext;
+		delete Head->pPrev;
+		Head->pPrev = nullptr;
+		Size--;
+	}
+
+	/*void pop_back()
+	{
+	Tail = Tail->pPrev;
+	delete Tail->pNext;
+	Tail->pPrev = nullptr;
+	Size--;
+	}*/
+
+	void Print()//Если принт выводит список от головы до хвоста,
+				//то принтреверс будет выводить наооборот от хвоста до головы
+	{
+		//cout << "Адрес начала списка:" << tab << Head << endl;
+		for (Element* Temp = Head; Temp != nullptr; Temp = Temp->pNext)
+		{
+			cout << Temp->pPrev << tab << Temp << tab << Temp->Data << tab << Temp->pNext << endl;
+		}
+		//cout << "Адрес конца списка:" << tab << Tail << endl;
+		cout << "Кол-во елементов списка:" << Size << endl;
+	}
+
+	void PrintReverse()
+	{
+		for (Element* Temp = Tail; Temp != nullptr; Temp = Temp->pPrev)
+		{
+			cout << Temp->pNext << tab << Temp << tab << Temp->Data << tab << Temp->pPrev << endl;
+		}
+	}
+};
+template<typename T>
+T Sum(int Count, T Data,...)
+{
+	T res = 0;
+	T* it = &Data;
+	while (Count--)
+	{
+		res += *it++;
+	}
+	return res;
+}
+void main()
+{
+	setlocale(LC_ALL, "Russian");
+	int n;//кол-во елементов списка 
+	int Data;
+	int Index;
+	
+	cout << "Введите кол-во елементов:"; cin >> n;
+	List list;
+	for (int i = 0; i < n; i++)
+	{
+		list.push_front(rand() % 100);
+	}
+	list.push_back(1024);
+	/*list.pop_front();*/
+	/*list.pop_back();*/
+	list.Print();
+	cout << "************************************************" << endl;
+	//list.PrintReverse();
+	cout << "************************************************" << endl;
+	/*for (int i = 0; i < n; i++)
+	{
+	list.push_back(rand() % 100);
+	}*/
+
+	/*cout << "Введеите значение добавляемого элемента: "; cin >> Data;
+	cout << "По какому индексу добавить элемент: "; cin >> Index;
+	list.Insert(Data, Index);
+	list.Print();*/
+	/*cout << "************************************************" << endl;
+	cout << "Введите индекс удаляемого елем: "; cin >> Index;
+	list.Erase(Index);
+	list.Print();*/
+	cout << Sum(3.3, 2.3, 3.3, 7.7) << endl;
+
+}
